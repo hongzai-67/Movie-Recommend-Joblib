@@ -422,7 +422,6 @@ def main():
     st.markdown("📊 Displays: Name, Year, Rating, Genre, Crew, Language, Country, Similarity")
     st.write("")
 
-    # Sidebar upload / reset
 uploaded_file = st.sidebar.file_uploader("Upload IMDB dataset (CSV)", type="csv")
 
 # Try to load bundled joblib first (minimal addition)
@@ -450,7 +449,7 @@ if recommender is None:
     if not uploaded_file:
         st.sidebar.info("No bundled model found. Upload imdb_movies.csv in the sidebar or place 'recommender.joblib' next to this app.")
         st.warning("Please upload imdb_movies.csv in the sidebar.")
-        return
+        return   # <-- valid because we're inside main()
 
     recommender = IMDBContentBasedRecommendationSystem()
     try:
@@ -658,5 +657,6 @@ if recommender is None:
 
 if __name__ == "__main__":
     main()
+
 
 
