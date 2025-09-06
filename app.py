@@ -455,7 +455,6 @@ if recommender is None:
         recommender.load_imdb_data(uploaded_file)
     except Exception as e:
         st.error(f"Failed to load dataset: {e}")
-        return
 
     try:
         recommender.build_content_based_system()
@@ -656,6 +655,7 @@ if recommender is None:
 
 if __name__ == "__main__":
     main()
+
 
 
 
