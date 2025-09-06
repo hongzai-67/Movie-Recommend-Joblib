@@ -3,11 +3,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import re
-import joblib
-import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from math import sqrt
+import joblib
+import os
 
 # ---------------------------
 # Recommendation System Class
@@ -422,44 +422,34 @@ def main():
     st.markdown("📊 Displays: Name, Year, Rating, Genre, Crew, Language, Country, Similarity")
     st.write("")
 
-uploaded_file = st.sidebar.file_uploader("Upload IMDB dataset (CSV)", type="csv")
+    # Sidebar upload / reset like again.txt
+    uploaded_file = st.sidebar.file_uploader("Upload IMDB dataset (CSV)", type="csv")
+    if st.sidebar.button("🔄 Reset All Records"):
+        # clear session state (but not the uploaded file)
+        for k in list(st.session_state.keys()):
+            if k.startswith("choices_") or k.startswith("confirmed_") or k in ("last_query",):
+                try:
+                    del st.session_state[k]
+                except:
+                    pass
+        st.experimental_rerun()
 
-# Try to load bundled joblib first (minimal addition)
-local_joblib_path = "recommender.joblib"
-recommender = None
-if os.path.exists(local_joblib_path):
-    st.sidebar.success(f"Found bundled model: {local_joblib_path}")
-    try:
-        recommender = joblib.load(local_joblib_path)
-    except Exception as e:
-        st.sidebar.error(f"Failed to load bundled model: {e}")
-        recommender = None
-
-if st.sidebar.button("🔄 Reset All Records"):
-    for k in list(st.session_state.keys()):
-        if k.startswith("choices_") or k.startswith("confirmed_") or k in ("last_query",):
-            try:
-                del st.session_state[k]
-            except:
-                pass
-    st.experimental_rerun()
-
-# If no bundled recommender, fall back to uploaded CSV
-if recommender is None:
     if not uploaded_file:
-        st.sidebar.info("No bundled model found. Upload imdb_movies.csv in the sidebar or place 'recommender.joblib' next to this app.")
         st.warning("Please upload imdb_movies.csv in the sidebar.")
+        return
 
     recommender = IMDBContentBasedRecommendationSystem()
     try:
         recommender.load_imdb_data(uploaded_file)
     except Exception as e:
         st.error(f"Failed to load dataset: {e}")
+        return
 
     try:
         recommender.build_content_based_system()
     except Exception as e:
         st.error(f"Failed to build content system: {e}")
+        return
 
     # Menu (keeps numbering and labels same as your sample)
     option = st.radio("🎯 SEARCH OPTIONS:", [
@@ -654,10 +644,3 @@ if recommender is None:
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
