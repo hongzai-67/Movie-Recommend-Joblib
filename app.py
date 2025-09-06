@@ -422,19 +422,33 @@ def main():
     st.markdown("📊 Displays: Name, Year, Rating, Genre, Crew, Language, Country, Similarity")
     st.write("")
 
-    # Sidebar upload / reset like again.txt
-    uploaded_file = st.sidebar.file_uploader("Upload IMDB dataset (CSV)", type="csv")
-    if st.sidebar.button("🔄 Reset All Records"):
-        # clear session state (but not the uploaded file)
-        for k in list(st.session_state.keys()):
-            if k.startswith("choices_") or k.startswith("confirmed_") or k in ("last_query",):
-                try:
-                    del st.session_state[k]
-                except:
-                    pass
-        st.experimental_rerun()
+    # Sidebar upload / reset
+uploaded_file = st.sidebar.file_uploader("Upload IMDB dataset (CSV)", type="csv")
 
+# Try to load bundled joblib first (minimal addition)
+local_joblib_path = "recommender.joblib"
+recommender = None
+if os.path.exists(local_joblib_path):
+    st.sidebar.success(f"Found bundled model: {local_joblib_path}")
+    try:
+        recommender = joblib.load(local_joblib_path)
+    except Exception as e:
+        st.sidebar.error(f"Failed to load bundled model: {e}")
+        recommender = None
+
+if st.sidebar.button("🔄 Reset All Records"):
+    for k in list(st.session_state.keys()):
+        if k.startswith("choices_") or k.startswith("confirmed_") or k in ("last_query",):
+            try:
+                del st.session_state[k]
+            except:
+                pass
+    st.experimental_rerun()
+
+# If no bundled recommender, fall back to uploaded CSV
+if recommender is None:
     if not uploaded_file:
+        st.sidebar.info("No bundled model found. Upload imdb_movies.csv in the sidebar or place 'recommender.joblib' next to this app.")
         st.warning("Please upload imdb_movies.csv in the sidebar.")
         return
 
@@ -644,4 +658,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
