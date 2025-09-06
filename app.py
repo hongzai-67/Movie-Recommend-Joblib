@@ -449,7 +449,6 @@ if recommender is None:
     if not uploaded_file:
         st.sidebar.info("No bundled model found. Upload imdb_movies.csv in the sidebar or place 'recommender.joblib' next to this app.")
         st.warning("Please upload imdb_movies.csv in the sidebar.")
-        return    # <-- valid because this code is inside main()
 
     recommender = IMDBContentBasedRecommendationSystem()
     try:
@@ -657,6 +656,7 @@ if recommender is None:
 
 if __name__ == "__main__":
     main()
+
 
 
 
