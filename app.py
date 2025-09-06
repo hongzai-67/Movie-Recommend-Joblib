@@ -460,7 +460,6 @@ if recommender is None:
         recommender.build_content_based_system()
     except Exception as e:
         st.error(f"Failed to build content system: {e}")
-        return
 
     # Menu (keeps numbering and labels same as your sample)
     option = st.radio("🎯 SEARCH OPTIONS:", [
@@ -655,6 +654,7 @@ if recommender is None:
 
 if __name__ == "__main__":
     main()
+
 
 
 
